@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -50,6 +51,7 @@ func (s *Server) Stop() error {
 func (s *Server) doGet(c *gin.Context) {
 	key := []byte(c.Query("key"))
 	value, err := s.store.Get(key)
+	fmt.Println(key)
 	if err != nil {
 		c.JSON(http.StatusOK, returnError(err))
 		return
@@ -65,7 +67,7 @@ func (s *Server) doSet(c *gin.Context) {
 		c.JSON(http.StatusOK, returnError(err))
 		return
 	}
-
+	fmt.Println(req)
 	err = s.store.Set([]byte(req.Key), []byte(req.Value))
 	if err != nil {
 		c.JSON(http.StatusOK, returnError(err))
@@ -77,6 +79,7 @@ func (s *Server) doSet(c *gin.Context) {
 
 func (s *Server) doDelete(c *gin.Context) {
 	key := []byte(c.Query("key"))
+	fmt.Println(key)
 	err := s.store.Delete(key)
 	if err != nil {
 		c.JSON(http.StatusOK, returnError(err))
