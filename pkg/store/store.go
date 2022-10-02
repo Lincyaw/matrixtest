@@ -51,9 +51,9 @@ type raftStore struct {
 	node    raft.Node
 	storage raft.Storage
 
-	proposeC    <-chan string            // proposed messages (k,v)
-	confChangeC <-chan raftpb.ConfChange // proposed cluster config changes
-	stopc       chan struct{}            // signals proposal channel closed
+	proposeC    chan string            // proposed messages (k,v)
+	confChangeC chan raftpb.ConfChange // proposed cluster config changes
+	stopc       chan struct{}          // signals proposal channel closed
 
 	ticker *time.Ticker
 	db     *PebbleDB
@@ -83,7 +83,6 @@ func (r *raftStore) serveChannel() {
 	// send proposals over raft
 	go func() {
 		confChangeCount := uint64(0)
-
 		for r.proposeC != nil && r.confChangeC != nil {
 			select {
 			case prop, ok := <-r.proposeC:
@@ -115,29 +114,34 @@ func (r *raftStore) serveChannel() {
 		close(r.stopc)
 	}()
 
-	// event loop on raft state machine updates
-	for {
-		select {
-		case <-ticker.C:
-			r.node.Tick()
-		// store raft entries to wal, then publish over commit channel
-		case rd := <-r.node.Ready():
-			fmt.Printf("%+v", rd)
-			r.node.Advance()
-		case <-r.stopc:
-			return
+	go func() {
+		// event loop on raft state machine updates
+		for {
+			select {
+			case <-ticker.C:
+				r.node.Tick()
+			// store raft entries to wal, then publish over commit channel
+			case rd := <-r.node.Ready():
+				fmt.Printf("%+v", rd)
+				r.node.Advance()
+			case <-r.stopc:
+				return
+			}
 		}
-	}
+	}()
 }
 func (r *raftStore) Set(key []byte, value []byte) error {
 	fmt.Println("set")
+	r.proposeC <- fmt.Sprintf("set[%v][%v]", key, value)
 	return r.db.Set(key, value)
 }
 func (r *raftStore) Get(key []byte) ([]byte, error) {
 	fmt.Println("get")
+	r.proposeC <- fmt.Sprintf("get[%v]", key)
 	return r.db.Get(key)
 }
 func (r *raftStore) Delete(key []byte) error {
 	fmt.Println("delete")
+	r.proposeC <- fmt.Sprintf("delete[%v]", key)
 	return r.db.Delete(key)
 }
