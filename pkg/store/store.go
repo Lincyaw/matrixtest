@@ -61,7 +61,7 @@ type raftStore struct {
 
 func (r *raftStore) start() {
 	c := &raft.Config{
-		ID:                        uint64(r.id),
+		ID:                        0x20,
 		ElectionTick:              10,
 		HeartbeatTick:             1,
 		Storage:                   r.storage,
