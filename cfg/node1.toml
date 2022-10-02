@@ -1,0 +1,6 @@
+[api]
+addr = "localhost:8080"
+
+[store]
+memory = false
+dataPath = "/tmp"
