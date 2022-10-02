@@ -86,6 +86,7 @@ func (r *raftStore) serveChannel() {
 		for r.proposeC != nil && r.confChangeC != nil {
 			select {
 			case prop, ok := <-r.proposeC:
+				fmt.Printf("prop:[%v]", prop)
 				if !ok {
 					r.proposeC = nil
 				} else {
@@ -97,6 +98,7 @@ func (r *raftStore) serveChannel() {
 					}
 				}
 			case cc, ok := <-r.confChangeC:
+				fmt.Printf("confChangeC:[%v]", cc)
 				if !ok {
 					r.confChangeC = nil
 				} else {
