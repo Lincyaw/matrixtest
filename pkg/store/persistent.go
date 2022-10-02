@@ -1,6 +1,7 @@
 package store
 
 import (
+	"fmt"
 	"github.com/cockroachdb/pebble"
 )
 
@@ -22,6 +23,7 @@ type PebbleDB struct {
 }
 
 func (p *PebbleDB) Set(k, v []byte) error {
+	fmt.Printf("pebbledb set key[%v] value[%v]\n", string(k), string(v))
 	return p.DB.Set(k, v, pebble.Sync)
 }
 
@@ -33,8 +35,10 @@ func (p *PebbleDB) Get(k []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	fmt.Printf("pebbledb get key[%v] value[%v]\n", string(k), string(value))
 	return value, nil
 }
 func (p *PebbleDB) Delete(k []byte) error {
+	fmt.Printf("pebbledb delete key[%v]\n", string(k))
 	return p.DB.Delete(k, pebble.Sync)
 }
