@@ -130,11 +130,14 @@ func (r *raftStore) serveChannel() {
 	}
 }
 func (r *raftStore) Set(key []byte, value []byte) error {
+	fmt.Println("set")
 	return r.db.Set(key, value)
 }
 func (r *raftStore) Get(key []byte) ([]byte, error) {
+	fmt.Println("get")
 	return r.db.Get(key)
 }
 func (r *raftStore) Delete(key []byte) error {
+	fmt.Println("delete")
 	return r.db.Delete(key)
 }
