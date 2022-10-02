@@ -31,6 +31,9 @@ func (p *PebbleDB) Get(k []byte) ([]byte, error) {
 	v, closer, err := p.DB.Get(k)
 	var value []byte
 	copy(value, v)
+	if err != nil {
+		return nil, err
+	}
 	err = closer.Close()
 	if err != nil {
 		return nil, err
